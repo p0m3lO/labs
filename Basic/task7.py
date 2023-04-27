@@ -1,39 +1,29 @@
-import os
-import sys
 import subprocess
-import tempfile
+import sys
+import os
+import time
 
-def check_grep_search_script(script_path, file_path, pattern):
+def check_cron_job_exists(command):
     try:
-        if os.path.isfile(script_path) and os.access(script_path, os.X_OK):
-            result = subprocess.run([script_path, file_path, pattern], capture_output=True)
-            if result.returncode == 0:
-                return True
-            else:
-                return False
-        else:
-            return False
-    except Exception as e:
-        print(f"Error: {e}")
+        result = subprocess.run(["crontab", "-l"], stdout=subprocess.PIPE, text=True)
+        return command in result.stdout
+    except subprocess.CalledProcessError:
         return False
 
 if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "search.sh")
+    command = "*/2 * * * * date >> /tmp/timestamps.txt"
+    file_path = "/tmp/timestamps.txt"
 
-    # Create a temporary file with some content for testing
-    with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
-        temp_file.write("This is a test file.\n")
-        temp_file.write("It contains some lines with the word 'test'.\n")
-        temp_file.write("This line does not contain the keyword.\n")
-        temp_file.write("Another line with 'test' in it.\n")
+    if check_cron_job_exists(command):
+        print("The cron job is configured correctly.")
+        print("Waiting for 65 seconds to check if the cron job is running...")
+        time.sleep(125)
 
-    test_pattern = "test"
-    result = check_grep_search_script(script_path, temp_file.name, test_pattern)
-    os.remove(temp_file.name)  # Clean up the temporary file
-
-    if result:
-        print(f"The grep search script '{script_path}' runs successfully.")
+        if os.path.exists(file_path):
+            print("The cron job is running and appending to the file.")
+        else:
+            print("The cron job is NOT running or appending to the file.")
+            sys.exit(1)
     else:
-        print(f"The grep search script '{script_path}' does NOT run successfully.")
+        print("The cron job is NOT configured correctly.")
         sys.exit(1)

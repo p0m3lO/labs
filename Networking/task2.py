@@ -1,28 +1,48 @@
 import os
-import sys
 import subprocess
+from bs4 import BeautifulSoup
 
-def check_ping_monitor_script(script_path, ip_address):
+def check_nginx_installed():
     try:
-        if os.path.isfile(script_path) and os.access(script_path, os.X_OK):
-            result = subprocess.run([script_path, ip_address], capture_output=True)
-            if result.returncode == 0:
-                return True
-            else:
-                return False
-        else:
-            return False
-    except Exception as e:
-        print(f"Error: {e}")
+        result = subprocess.run(['nginx', '-v'], stderr=subprocess.PIPE, text=True)
+        return "nginx" in result.stderr
+    except FileNotFoundError:
         return False
 
-if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "monitor.sh")
-    test_ip_address = "1.1.1.1"
-    result = check_ping_monitor_script(script_path, test_ip_address)
-    if result:
-        print(f"The monitoring script '{script_path}' runs successfully.")
+def check_custom_welcome_page():
+    custom_page_path = "/var/www/gde/index.html"
+    if not os.path.exists(custom_page_path):
+        return False
+
+    with open(custom_page_path, "r") as f:
+        content = f.read()
+
+    soup = BeautifulSoup(content, "html.parser")
+    h1_elements = soup.find_all("h1")
+
+    if len(h1_elements) == 1 and h1_elements[0].text == "Welcome to My GDE lab test Site!":
+        return True
     else:
-        print(f"The monitoring script '{script_path}' does NOT run successfully.")
+        return False
+
+def check_nginx_running():
+    result = subprocess.run(['systemctl', 'is-active', 'nginx'], stdout=subprocess.PIPE, text=True)
+    return result.stdout.strip() == 'active'
+
+def main():
+    if not check_nginx_installed():
+        print("Nginx is not installed.")
         sys.exit(1)
+
+    if not check_custom_welcome_page():
+        print("The custom welcome page is not configured correctly.")
+        sys.exit(1)
+
+    if not check_nginx_running():
+        print("Nginx is not running.")
+        sys.exit(1)
+
+    print("Everything is set up correctly!")
+
+if __name__ == "__main__":
+    main()

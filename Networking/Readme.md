@@ -12,23 +12,16 @@
 
 ## 2. Task
 
-### Create a monitor script 
-
-Create a ***Bash script*** named ***monitor.sh*** in the ***home directory*** that pings a server using the IP address provided as the first positional parameter. The script should be executable.
-
-
-## 3. Task
-
-### Create a Web server
+### Create a Basic Nginx Web server
 
 - ***Install*** Nginx web server
 - ***Create*** a custom HTML welcome page with the text ***"Welcome to My GDE lab test Site!"*** in an `<h1>` element
-- ***Configure*** Nginx to serve the custom welcome page as the default page
+- ***Configure*** Nginx to serve the custom welcome page as the default page, it should served from ***/var/www/gde*** directory
 - ***Restart*** the Nginx service to apply the changes
 
-## 4. Task
+## 3. Task
 
-### Basic file creation Task
+### Basic NFS server Task
 
 Create an ***NFS server*** that only supports NFSv4 protocol and exports a shared directory to clients in
 

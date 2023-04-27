@@ -1,46 +1,54 @@
-import os
-import sys
 import subprocess
-import tempfile
+import sys
+import os
+import re
+import time
 
-def check_redirection_demo_script(script_path, input_file_path, output_file_path):
+def check_package_installed(package_name):
     try:
-        if os.path.isfile(script_path) and os.access(script_path, os.X_OK):
-            result = subprocess.run([script_path, input_file_path, output_file_path])
-            if result.returncode == 0:
-                with open(output_file_path, "r") as output_file:
-                    content = output_file.read()
-                    if content.isupper():
-                        return True
-                    else:
-                        return False
-            else:
-                return False
-        else:
-            return False
-    except Exception as e:
-        print(f"Error: {e}")
+        subprocess.run(["which", package_name], check=True, stdout=subprocess.PIPE)
+        return True
+    except subprocess.CalledProcessError:
         return False
 
+def check_postfix_config():
+    config_file = "/etc/postfix/main.cf"
+    if not os.path.exists(config_file):
+        return False
+
+    with open(config_file, "r") as f:
+        content = f.read()
+
+    myhostname = re.search(r'^myhostname\s*=\s*(.+)$', content, re.MULTILINE)
+    inet_interfaces = re.search(r'^inet_interfaces\s*=\s*(.+)$', content, re.MULTILINE)
+    
+    return (myhostname and myhostname.group(1) == "gdemailserver" and
+            inet_interfaces and inet_interfaces.group(1) == "localhost")
+
+def send_test_email(user):
+    try:
+        subprocess.run(["echo", "This is a test email", "|", "mail", "-s", "Test Email", user], check=True)
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+def check_test_email(user):
+    result = subprocess.run(["mail", "-u", user, "-H"], stdout=subprocess.PIPE, text=True)
+    return "Test Email" in result.stdout
+
 if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "redirection.sh")
+    package_name = "postfix"
+    test_user = "gde"
 
-    # Create a temporary input file with some content for testing
-    with tempfile.NamedTemporaryFile(mode="w", delete=False) as input_temp_file:
-        input_temp_file.write("This is a test file.\n")
-        input_temp_file.write("It contains some lines with mixed case characters.\n")
-
-    # Create a temporary output file to store the result
-    with tempfile.NamedTemporaryFile(mode="w", delete=False) as output_temp_file:
-        pass
-
-    result = check_redirection_demo_script(script_path, input_temp_file.name, output_temp_file.name)
-    os.remove(input_temp_file.name)  # Clean up the temporary input file
-    os.remove(output_temp_file.name)  # Clean up the temporary output file
-
-    if result:
-        print(f"The redirection demo script '{script_path}' runs successfully.")
+    if (check_package_installed(package_name) and
+        check_postfix_config() and
+        send_test_email(test_user)):
+        time.sleep(10)  # Wait a few seconds to ensure the email is delivered
+        if check_test_email(test_user):
+            print("The local email server with Postfix is configured and working correctly.")
+        else:
+            print("The local email server with Postfix is NOT working correctly.")
+            sys.exit(1)
     else:
-        print(f"The redirection demo script '{script_path}' does NOT run successfully.")
+        print("The local email server with Postfix is NOT configured correctly.")
         sys.exit(1)
