@@ -6,7 +6,7 @@ import time
 
 def check_package_installed(package_name):
     try:
-        subprocess.run(["which", package_name], check=True, stdout=subprocess.PIPE)
+        subprocess.run(["dpkg-query", "-W", "-f='${Status}'", package_name], check=True, stdout=subprocess.PIPE, text=True)
         return True
     except subprocess.CalledProcessError:
         return False
