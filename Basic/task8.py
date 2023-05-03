@@ -33,7 +33,7 @@ def send_test_email(user):
     return True
 
 def check_test_email(user):
-    result = subprocess.run(["mail", "-u", user, "-H"], stdout=subprocess.PIPE, text=True)
+    result = subprocess.run(["sudo", "mail", "-u", user, "-H"], stdout=subprocess.PIPE, text=True)
     return "Test Email" in result.stdout
 
 if __name__ == "__main__":
