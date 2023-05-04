@@ -30,3 +30,9 @@ Create an ***NFS server*** that only supports NFSv4 protocol and exports a share
 - Configure the NFS server to export the shared directory and allow only NFSv4 protocol
 - Start and enable the NFS server service
 - Configure the firewall to allow NFSv4 traffic
+
+### 4. Task
+
+### Simple Mail Server configuration
+
+Install the ***postfix*** package, configure Postfix and ***mailutils*** to send and receive emails only within the local machine (localhost), and set the hostname to ***gdemailserver***

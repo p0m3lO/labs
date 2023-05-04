@@ -1,54 +1,70 @@
-import subprocess
-import sys
 import os
-import re
-import time
+import sys
+import subprocess
+from datetime import datetime, timedelta
 
-def check_package_installed(package_name):
+def check_find_logs(target_directory, size, days):
     try:
-        subprocess.run(["dpkg-query", "-W", "-f='${Status}'", package_name], check=True, stdout=subprocess.PIPE, text=True)
+        output = subprocess.run(
+            ["sudo", "find", target_directory, "-type", "f", "-iname", "*.log", "-mtime", f"-{days}", "-size", f"+{size}k"],
+            check=True,
+            stdout=subprocess.PIPE,
+            text=True
+        )
+        log_files = output.stdout.strip().split('\n')
+        if log_files == ['']:
+            log_files = []
+        return set(log_files)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+        return None
+
+def read_find_output(output_file):
+    try:
+        with open(output_file, 'r') as f:
+            lines = f.readlines()
+        log_files = [line.strip() for line in lines]
+        return set(log_files)
+    except FileNotFoundError:
+        print(f"Error: Output file '{output_file}' not found.")
+        return None
+
+def check_second_output(output_file):
+    try:
+        with open(output_file, 'r') as f:
+            lines = f.readlines()
+        
+        for line in lines:
+            if not line.startswith("found directory: ./") or not line.strip().endswith(")"):
+                return False
         return True
-    except subprocess.CalledProcessError:
+    except FileNotFoundError:
+        print(f"Error: Output file '{output_file}' not found.")
         return False
 
-def check_postfix_config():
-    config_file = "/etc/postfix/main.cf"
-    if not os.path.exists(config_file):
-        return False
-
-    with open(config_file, "r") as f:
-        content = f.read()
-
-    myhostname = re.search(r'^myhostname\s*=\s*(.+)$', content, re.MULTILINE)
-    inet_interfaces = re.search(r'^inet_interfaces\s*=\s*(.+)$', content, re.MULTILINE)
-    
-    return (myhostname and myhostname.group(1) == "gdemailserver" and
-            inet_interfaces and inet_interfaces.group(1) == "localhost")
-
-def send_test_email(user):
-    try:
-        subprocess.run(["echo", "This is a test email", "|", "mail", "-s", "Test Email", user], check=True)
-    except subprocess.CalledProcessError:
-        return False
-    return True
-
-def check_test_email(user):
-    result = subprocess.run(["sudo", "mail", "-u", user, "-H"], stdout=subprocess.PIPE, text=True)
-    return "Test Email" in result.stdout
 
 if __name__ == "__main__":
-    package_name = "postfix"
-    test_user = "gde"
+    target_directory = "/var/log"
+    size = 10
+    days = 7
+    log_output_file = "/tmp/first_output.log"
+    dir_output_file = "/tmp/second_output.log"
 
-    if (check_package_installed(package_name) and
-        check_postfix_config() and
-        send_test_email(test_user)):
-        time.sleep(10)  # Wait a few seconds to ensure the email is delivered
-        if check_test_email(test_user):
-            print("The local email server with Postfix is configured and working correctly.")
+    expected_log_files = check_find_logs(target_directory, size, days)
+    find_log_files = read_find_output(log_output_file)
+
+    if expected_log_files is not None and find_log_files is not None:
+        if expected_log_files == find_log_files:
+            print("The first output file matches the expected log files.")
         else:
-            print("The local email server with Postfix is NOT working correctly.")
+            print("The first output file does NOT match the expected log files.")
             sys.exit(1)
     else:
-        print("The local email server with Postfix is NOT configured correctly.")
+        print("An error occurred while checking the first output file.")
+        sys.exit(1)
+    
+    if check_second_output(dir_output_file):
+        print("The second output file has the expected content.")
+    else:
+        print("The second output file does NOT have the expected content.")
         sys.exit(1)

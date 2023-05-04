@@ -12,7 +12,6 @@
 
 Create a new directory called ***test*** inside the home directory with specific permissions ***755***
 
-
 ## 3. Task
 
 ### Basic user create Task
@@ -45,7 +44,28 @@ Create a ***cron job*** that runs ***every 2 minutes*** and appends the current 
 
 ### 8. Task
 
-### Simple Mail Server configuration
+### Simple Find usage
 
-Install the ***postfix*** package, configure Postfix and ***mailutils*** to send and receive emails only within the local machine (localhost), and set the hostname to ***gdemailserver***
+1. Find all ***.log*** files inside ***/var/log*** directory and its subdirectories that are larger than ***10 kilobytes*** and have been modified within the ***last 7 days*** and save the output to a log file called ***/tmp/first_output.log*** inside the home directory.
+
+2. Create some random directory and files in the user home directory (use a script for that). Find all directories in the user home directory: exclude the ***hidden directories***, and save  them to file called ***/tmp/second_output.log***. The output should be this format: ***found directory: ./<dirname> (4.0K)***
+
+
+### 9. Task
+
+### Simple localization configuration
+
+Configure the server's ***localization settings*** for the ***Hungarian language***
+
+### 10. Task
+
+### Simple ntp configuration
+
+Set the ***date*** with the date command. Configure NTP (Network Time Protocol) on the server. Set the server's ***timezone*** to ***Europe/Budapest*** and then install the ***chrony*** or ***ntp*** package  and configure it to use public NTP servers.
+
+### 11. Task
+
+### Basic screen usage
+
+Install ***screen package*** and use screen to create a sessin called ***demo_screen*** and then run a script called ***screen_test.sh***  in a detached session.
 
