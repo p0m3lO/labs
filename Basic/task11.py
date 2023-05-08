@@ -29,8 +29,19 @@ if __name__ == "__main__":
     process_name = "screen_test.sh"
 
     screen_installed = check_package_installed(package_name)
+    if not screen_installed:
+        print(f"The 'screen' package is not installed")
+        sys.exit(1)
+
     screen_session_found = find_screen_session(session_name)
+    if not screen_session_found:
+        print(f"the '{session_name}' session is NOT running")
+        sys.exit(1)
+
     process_running = check_process_running(process_name)
+    if not process_running:
+        print(f"the '{process_name}' script is NOT running within the session")
+        sys.exit(1)
 
     if screen_installed and screen_session_found and process_running:
         print(f"The 'screen' package is installed, the '{session_name}' session is running, and the '{process_name}' script is running within the session.")
