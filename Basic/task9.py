@@ -18,7 +18,7 @@ if __name__ == "__main__":
     locale_result = check_locale(target_locale)
 
     if locale_result:
-        print(f"The locale is set to '{target_locale}')
+        print(f"The locale is set to '{target_locale}'.")
     else:
-        print(f" The locale is NOT set to '{target_locale}')
+        print(f"The locale is NOT set to '{target_locale}'.")
         sys.exit(1)
