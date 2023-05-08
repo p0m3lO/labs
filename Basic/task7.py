@@ -16,8 +16,7 @@ if __name__ == "__main__":
 
     if check_cron_job_exists(command):
         print("The cron job is configured correctly.")
-        print("Waiting for 65 seconds to check if the cron job is running...")
-        time.sleep(125)
+        time.sleep(5)
 
         if os.path.exists(file_path):
             print("The cron job is running and appending to the file.")
