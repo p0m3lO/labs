@@ -42,6 +42,6 @@ Install the ***postfix*** package, configure Postfix and ***mailutils*** to send
 ### Simple Linux Firewall configuration
 
 - Install iptables if it is not already installed.
-- Create a ***working firewall*** and write rules to ***allow incoming connections*** to ***TCP/22*** port and the following ports from ***192.168.10.20*** IP address: ***TCP/80,443,2049,25***
+- Create a ***working firewall*** and write rules to ***allow incoming connections*** to ***TCP/22,5000,7681*** port and the following ports from ***192.168.10.20*** IP address: ***TCP/80,443,2049,25***
 - All ***other incoming traffic*** should be blocked
 - Ensure that these rules are ***saved*** and ***persist*** across reboots. You can either use ***manual*** approach or the ***iptables-persistent*** package
