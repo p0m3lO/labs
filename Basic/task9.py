@@ -5,9 +5,12 @@ import re
 
 def check_locale(target_locale):
     try:
-        result = subprocess.run(["locale"], stdout=subprocess.PIPE, text=True)
-        current_locale = dict(re.findall(r'(\w+)=(".*?")', result.stdout))
-        return current_locale.get("LANG", "") == target_locale
+        result = subprocess.run(["localectl", "status"], stdout=subprocess.PIPE, text=True)
+        current_locale = re.search(r'LANG=(.+)', result.stdout)
+        if current_locale:
+            return current_locale.group(1) == target_locale
+        else:
+            return False
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
         return False
