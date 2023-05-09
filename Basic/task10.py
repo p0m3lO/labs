@@ -58,12 +58,13 @@ if __name__ == "__main__":
 
     chrony_installed = check_package_installed("chrony")
     ntp_installed = check_package_installed("ntp")
+    chrony_service = check_service_status("chronyd")
 
     if not (chrony_installed or ntp_installed):
         print("Neither Chrony nor NTP is installed.")
         sys.exit(1)
 
-    if chrony_installed:
+    if chrony_installed and chrony_service:
         config_ok = check_chrony_config()
         service_ok = check_service_status("chronyd")
         package_name = "Chrony"
@@ -72,8 +73,22 @@ if __name__ == "__main__":
         service_ok = check_service_status("ntp")
         package_name = "NTP"
 
-    if timezone_result and config_ok and service_ok:
-        print(f"The timezone is set to '{target_timezone}', and the NTP service with {package_name} is configured and running correctly.")
+    if timezone_result:
+        print(f"The timezone is set to '{target_timezone}'")
     else:
-        print(f"Either the timezone is NOT set to '{target_timezone}', or the NTP service with {package_name} is NOT configured or running correctly.")
+        print(f"The timezone is NOT set to '{target_timezone}'")
+        sys.exit(1)
+
+    if service_ok:
+        print(f"The NTP service with {package_name} is running")
+
+    else:
+        print(f"The NTP service with {package_name} is NOT running")
+        sys.exit(1)
+
+    if config_ok:
+        print(f"The NTP service is configured correctly.")
+
+    else:
+        print(f"The NTP service is NOT configured correctly.")
         sys.exit(1)

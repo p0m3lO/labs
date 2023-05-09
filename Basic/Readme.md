@@ -1,7 +1,7 @@
 # Basic lab for linux
 
 ## 1. Task
- 
+
 ### Basic file creation Task
 
  Create a directory named ***gde*** inside the ***home directory*** and put a file called ***gde.txt*** into it with content: ***"This is a test"***
@@ -48,8 +48,10 @@ Create a ***cron job*** that runs ***every 2 minutes*** and appends the current 
 
 1. Find all ***.log*** files inside ***/var/log*** directory and its subdirectories that are larger than ***10 kilobytes*** and have been modified within the ***last 7 days*** and save the output to a log file called ***/tmp/first_output.log*** inside the home directory.
 
-2. Create some random directory and files in the user home directory (use a script for that). Find all directories in the user home directory: exclude the ***hidden directories***, and save  them to file called ***/tmp/second_output.log***. The output should be this format: ***found directory: ./<dirname> (4.0K)***
-
+2. Create some random directory and files in the user home directory (use a script for that). Find all directories in the user home directory: exclude the ***hidden directories***, and save  them to file called ***/tmp/second_output.log***. The output inside this log file should follow this format:
+    ***found directory: ./<dirname> (4.0K)***
+    ***found directory: ./<dirname2> (8.0K)***
+    ***found directory: ./<dirname3> (16.0K)***
 
 ### 9. Task
 
@@ -67,5 +69,5 @@ Set the ***date*** with the date command. Configure NTP (Network Time Protocol) 
 
 ### Basic screen usage
 
-Install ***screen package*** and use screen to create a sessin called ***demo_screen*** and then run a script called ***screen_test.sh***  in a detached session.
+Install ***screen package*** and use screen to create a sessin called ***demo_screen*** and then run a script continuously called ***screen_test.sh***  in a detached session.
 

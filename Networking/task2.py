@@ -1,13 +1,31 @@
 import os
 import subprocess
-from bs4 import BeautifulSoup
+from html.parser import HTMLParser
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.h1_text = None
+        self.current_tag = None
+
+    def handle_starttag(self, tag, attrs):
+        self.current_tag = tag
+
+    def handle_endtag(self, tag):
+        self.current_tag = None
+
+    def handle_data(self, data):
+        if self.current_tag == "h1":
+            self.h1_text = data
+
 
 def check_nginx_installed():
     try:
-        result = subprocess.run(['nginx', '-v'], stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(['sudo', 'nginx', '-v'], stderr=subprocess.PIPE, text=True)
         return "nginx" in result.stderr
     except FileNotFoundError:
         return False
+
 
 def check_custom_welcome_page():
     custom_page_path = "/var/www/gde/index.html"
@@ -17,17 +35,16 @@ def check_custom_welcome_page():
     with open(custom_page_path, "r") as f:
         content = f.read()
 
-    soup = BeautifulSoup(content, "html.parser")
-    h1_elements = soup.find_all("h1")
+    parser = MyHTMLParser()
+    parser.feed(content)
 
-    if len(h1_elements) == 1 and h1_elements[0].text == "Welcome to My GDE lab test Site!":
-        return True
-    else:
-        return False
+    return parser.h1_text == "Welcome to My GDE lab test Site!"
+
 
 def check_nginx_running():
     result = subprocess.run(['systemctl', 'is-active', 'nginx'], stdout=subprocess.PIPE, text=True)
     return result.stdout.strip() == 'active'
+
 
 def main():
     if not check_nginx_installed():
@@ -43,6 +60,7 @@ def main():
         sys.exit(1)
 
     print("Everything is set up correctly!")
+
 
 if __name__ == "__main__":
     main()
