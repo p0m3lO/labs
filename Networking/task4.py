@@ -1,54 +1,48 @@
-import subprocess
-import sys
 import os
-import re
-import time
+import sys
+import subprocess
 
-def check_package_installed(package_name):
+def is_nfs_installed():
     try:
-        subprocess.run(["which", package_name], check=True, stdout=subprocess.PIPE)
+        output = subprocess.check_output(['apt', 'list', 'nfs-kernel-server'], text=True)
+        return 'installed' in output
+    except subprocess.CalledProcessError:
+        return False
+
+def is_nfs_configured():
+    with open('/etc/exports', 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if '/opt/nfs/shared' in line and 'no_root_squash' in line in line:
+                return True
+    return False
+
+def is_nfs_v4_enabled():
+    with open('/etc/default/nfs-kernel-server', 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if '-N 2' in line and '-N 3' in line in line:
+                return True
+    return False
+
+def is_nfs_service_running():
+    try:
+        output = subprocess.check_output(['systemctl', 'is-active', 'nfs-server'], text=True)
+        return output.strip() == 'active'
+    except subprocess.CalledProcessError:
+        return False
+
+def check_firewall():
+    try:
+        cmd = "iptables -L INPUT -nv | grep -qE '(^| )dpt:2049($| )'"
+        subprocess.check_output(cmd, shell=True)
         return True
     except subprocess.CalledProcessError:
         return False
 
-def check_postfix_config():
-    config_file = "/etc/postfix/main.cf"
-    if not os.path.exists(config_file):
-        return False
-
-    with open(config_file, "r") as f:
-        content = f.read()
-
-    myhostname = re.search(r'^myhostname\s*=\s*(.+)$', content, re.MULTILINE)
-    inet_interfaces = re.search(r'^inet_interfaces\s*=\s*(.+)$', content, re.MULTILINE)
-    
-    return (myhostname and myhostname.group(1) == "gdemailserver" and
-            inet_interfaces and inet_interfaces.group(1) == "localhost")
-
-def send_test_email(user):
-    try:
-        subprocess.run(["echo", "This is a test email", "|", "mail", "-s", "Test Email", user], check=True)
-    except subprocess.CalledProcessError:
-        return False
-    return True
-
-def check_test_email(user):
-    result = subprocess.run(["mail", "-u", user, "-H"], stdout=subprocess.PIPE, text=True)
-    return "Test Email" in result.stdout
-
-if __name__ == "__main__":
-    package_name = "postfix"
-    test_user = "gde"
-
-    if (check_package_installed(package_name) and
-        check_postfix_config() and
-        send_test_email(test_user)):
-        time.sleep(10)  # Wait a few seconds to ensure the email is delivered
-        if check_test_email(test_user):
-            print("The local email server with Postfix is configured and working correctly.")
-        else:
-            print("The local email server with Postfix is NOT working correctly.")
-            sys.exit(1)
+if __name__ == '__main__':
+    if is_nfs_installed() and is_nfs_configured() and is_nfs_service_running() and check_firewall():
+        print("Success: NFS server with NFSv4 is set up correctly.")
     else:
-        print("The local email server with Postfix is NOT configured correctly.")
+        print("Failed: NFS server with NFSv4 is not set up correctly.")
         sys.exit(1)

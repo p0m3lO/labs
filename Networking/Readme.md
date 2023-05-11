@@ -9,8 +9,17 @@
 3. Test the connection eg.: ***$ ssh gde-server***
 4. Configure the local ssh daemon: disable ***root login***, disable ***password authentication***
 
-
 ## 2. Task
+
+### SSHFS configuration:
+
+1. Create a directory on the ***gde-server***: ***/mnt/mount***
+2. Install the sshfs package
+3. Mount it on the ***lab_vm*** with sshfs command to path: ***/mnt/shared***
+4. Make it ***auto-mount*** at startup
+5. Use the ***ssh alias*** configured in the ***1. Task***
+
+## 3. Task
 
 ### Create a Basic Nginx Web server
 
@@ -19,7 +28,7 @@
 - ***Configure*** Nginx to serve the custom welcome page as the default page, it should served from ***/var/www/gde*** directory
 - ***Restart*** the Nginx service to apply the changes
 
-## 3. Task
+## 4. Task
 
 ### Basic NFS server Task
 
@@ -31,13 +40,13 @@ Create an ***NFS server*** that only supports NFSv4 protocol and exports a share
 - Start and enable the NFS server service
 - Configure the firewall to allow NFSv4 traffic
 
-### 4. Task
+### 5. Task
 
 ### Simple Mail Server configuration
 
 Install the ***postfix*** package, configure Postfix and ***mailutils*** to send and receive emails only within the local machine (localhost), and set the hostname to ***gdemailserver***
 
-### 5. Task
+### 6. Task
 
 ### Simple Linux Firewall configuration
 

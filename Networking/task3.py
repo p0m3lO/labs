@@ -1,48 +1,66 @@
 import os
-import sys
 import subprocess
+from html.parser import HTMLParser
 
-def is_nfs_installed():
+class MyHTMLParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.h1_text = None
+        self.current_tag = None
+
+    def handle_starttag(self, tag, attrs):
+        self.current_tag = tag
+
+    def handle_endtag(self, tag):
+        self.current_tag = None
+
+    def handle_data(self, data):
+        if self.current_tag == "h1":
+            self.h1_text = data
+
+
+def check_nginx_installed():
     try:
-        output = subprocess.check_output(['apt', 'list', 'nfs-kernel-server'], text=True)
-        return 'installed' in output
-    except subprocess.CalledProcessError:
+        result = subprocess.run(['sudo', 'nginx', '-v'], stderr=subprocess.PIPE, text=True)
+        return "nginx" in result.stderr
+    except FileNotFoundError:
         return False
 
-def is_nfs_configured():
-    with open('/etc/exports', 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            if '/opt/nfs/shared' in line and 'no_root_squash' in line in line:
-                return True
-    return False
 
-def is_nfs_v4_enabled():
-    with open('/etc/default/nfs-kernel-server', 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            if '-N 2' in line and '-N 3' in line in line:
-                return True
-    return False
-
-def is_nfs_service_running():
-    try:
-        output = subprocess.check_output(['systemctl', 'is-active', 'nfs-server'], text=True)
-        return output.strip() == 'active'
-    except subprocess.CalledProcessError:
+def check_custom_welcome_page():
+    custom_page_path = "/var/www/gde/index.html"
+    if not os.path.exists(custom_page_path):
         return False
 
-def check_firewall():
-    try:
-        cmd = "iptables -L INPUT -nv | grep -qE '(^| )dpt:2049($| )'"
-        subprocess.check_output(cmd, shell=True)
-        return True
-    except subprocess.CalledProcessError:
-        return False
+    with open(custom_page_path, "r") as f:
+        content = f.read()
 
-if __name__ == '__main__':
-    if is_nfs_installed() and is_nfs_configured() and is_nfs_service_running() and check_firewall():
-        print("Success: NFS server with NFSv4 is set up correctly.")
-    else:
-        print("Failed: NFS server with NFSv4 is not set up correctly.")
+    parser = MyHTMLParser()
+    parser.feed(content)
+
+    return parser.h1_text == "Welcome to My GDE lab test Site!"
+
+
+def check_nginx_running():
+    result = subprocess.run(['systemctl', 'is-active', 'nginx'], stdout=subprocess.PIPE, text=True)
+    return result.stdout.strip() == 'active'
+
+
+def main():
+    if not check_nginx_installed():
+        print("Nginx is not installed.")
         sys.exit(1)
+
+    if not check_custom_welcome_page():
+        print("The custom welcome page is not configured correctly.")
+        sys.exit(1)
+
+    if not check_nginx_running():
+        print("Nginx is not running.")
+        sys.exit(1)
+
+    print("Everything is set up correctly!")
+
+
+if __name__ == "__main__":
+    main()

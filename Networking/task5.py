@@ -1,96 +1,54 @@
-import os
-import sys
 import subprocess
-
+import sys
+import os
+import re
+import time
 
 def check_package_installed(package_name):
     try:
-        result = subprocess.run(['dpkg', '-s', package_name], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-        return result.returncode == 0
+        subprocess.run(["which", package_name], check=True, stdout=subprocess.PIPE)
+        return True
     except subprocess.CalledProcessError:
         return False
 
-def check_iptables_rules():
+def check_postfix_config():
+    config_file = "/etc/postfix/main.cf"
+    if not os.path.exists(config_file):
+        return False
+
+    with open(config_file, "r") as f:
+        content = f.read()
+
+    myhostname = re.search(r'^myhostname\s*=\s*(.+)$', content, re.MULTILINE)
+    inet_interfaces = re.search(r'^inet_interfaces\s*=\s*(.+)$', content, re.MULTILINE)
+    
+    return (myhostname and myhostname.group(1) == "gdemailserver" and
+            inet_interfaces and inet_interfaces.group(1) == "localhost")
+
+def send_test_email(user):
     try:
-        result = subprocess.run(['sudo', 'iptables', '-S'], stdout=subprocess.PIPE, text=True)
-        rules = result.stdout.split('\n')
-        rules = [' '.join(rule.split()) for rule in rules]
-
-        expected_rules = {
-            '-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 80 -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 443 -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 2049 -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 25 -j ACCEPT',
-            '-A INPUT -p tcp -m tcp --dport 5000 -j ACCEPT',
-            '-A INPUT -p tcp -m tcp --dport 7681 -j ACCEPT',
-            '-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT',
-            '-A INPUT -j DROP'
-        }
-
-        return expected_rules.issubset(set(rules)), expected_rules
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
-        return False, {}
-
-
-def check_persistence(expected_rules):
-    # Check if the package iptables-persistent is installed
-    package_installed = check_package_installed("iptables-persistent")
-    if package_installed:
-        return True
-
-def check_manual_persistence():
-    script_path = "/etc/network/if-pre-up.d/iptables"
-    expected_line = "iptables-restore < /etc/iptables/rules.v4"
-
-    # Check that the script file exists
-    if not os.path.exists(script_path):
+        subprocess.run(["echo", "This is a test email", "|", "mail", "-s", "Test Email", user], check=True)
+    except subprocess.CalledProcessError:
         return False
-
-    # Check the content of the script file
-    with open(script_path, 'r') as f:
-        lines = f.readlines()
-
-    if expected_line not in [line.strip() for line in lines]:
-        return False
-
-    # Check that the script file is executable
-    if not os.access(script_path, os.X_OK):
-        return False
-
     return True
 
-    # Check for manual persistence
-    try:
-        with open('/etc/iptables/rules.v4', 'r') as f:
-            rules = f.read().splitlines()
-        for rule in expected_rules:
-            if rule not in rules:
-                return False
-        return True
-    except FileNotFoundError:
-        return False
-
+def check_test_email(user):
+    result = subprocess.run(["mail", "-u", user, "-H"], stdout=subprocess.PIPE, text=True)
+    return "Test Email" in result.stdout
 
 if __name__ == "__main__":
-    rules_ok, expected_rules = check_iptables_rules()
-    if not rules_ok:
-        print("The iptables rules are not configured correctly.")
-        sys.exit(1)
+    package_name = "postfix"
+    test_user = "gde"
 
-    if check_persistence(expected_rules):
-        print("The iptables rules are persistent.")
-
-    elif not check_persistence(expected_rules):
-        if check_manual_persistence():
-            print("The iptables manual persistency is set up correctly.")
+    if (check_package_installed(package_name) and
+        check_postfix_config() and
+        send_test_email(test_user)):
+        time.sleep(10)  # Wait a few seconds to ensure the email is delivered
+        if check_test_email(test_user):
+            print("The local email server with Postfix is configured and working correctly.")
         else:
-            print("The iptables manual persistency is not set up correctly.")
+            print("The local email server with Postfix is NOT working correctly.")
             sys.exit(1)
     else:
-        print("The iptables rules are not persistent.")
+        print("The local email server with Postfix is NOT configured correctly.")
         sys.exit(1)
-
-
-    print("The iptables rules are configured correctly and persistent!")
