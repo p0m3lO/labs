@@ -4,7 +4,7 @@ import subprocess
 
 def check_swap_size():
     result = subprocess.run(['sudo', 'swapon', '--show=size'], stdout=subprocess.PIPE, text=True)
-    swap_size = result.stdout.strip()
+    swap_size = result.stdout.strip().split('\n')[1]
     return swap_size == '1024M'
 
 def check_swap_file():
