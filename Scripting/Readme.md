@@ -33,7 +33,11 @@ Create a ***Bash script*** named ***monitor.sh*** in the ***scripts*** direcotry
 
 ### Random directory and file creation script
 
-Create a Bash script named ***random.sh*** in the ***scripts*** direcotry inside vagrant user ***home directory***, the script should create random ***directories*** and ***files*** inside a ***target directory***, the files should have ***random content***. The created directroies should have naming schema ***test_dir[n]*** and the created files ***file[n].txt***
+Create a Bash script named ***random.sh*** in the ***scripts*** direcotry inside vagrant user ***home directory***, the script should create random ***directories*** and ***files*** inside a ***target directory***, the files should have ***random content***.
+
+The created directroies should have naming schema ***test_dir[n]*** and the created files ***file[n].txt***
+
+***Eg.:*** test_dir1, test_dir2 and file1.txt, fil2.txt etc.
 
 ***Usage:***  ./random.sh [-d|--directory num_dirs] [-f|--files num_files] target_directory
 
