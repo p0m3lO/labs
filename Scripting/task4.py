@@ -21,8 +21,7 @@ def check_tar_demo_script(script_path, mode, archive_file_path, directory_path=N
         return False
 
 if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "tar_demo.sh")
+    script_path = os.path.expanduser("~/scripts/tar_demo.sh")
 
     # Create a temporary directory with some files for testing
     with tempfile.TemporaryDirectory() as temp_dir:

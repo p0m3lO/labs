@@ -18,7 +18,7 @@ def check_ping_monitor_script(script_path, ip_address):
 
 if __name__ == "__main__":
     user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "monitor.sh")
+    script_path = os.path.expanduser("~/scripts/monitor.sh")
     test_ip_address = "1.1.1.1"
     result = check_ping_monitor_script(script_path, test_ip_address)
     if result:

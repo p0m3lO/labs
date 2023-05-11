@@ -18,8 +18,7 @@ def check_grep_search_script(script_path, file_path, pattern):
         return False
 
 if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "search.sh")
+    script_path = os.path.expanduser("~/scripts/search.sh")
 
     # Create a temporary file with some content for testing
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:

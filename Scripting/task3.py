@@ -22,8 +22,7 @@ def check_find_files_script(script_path, directory_path, name_pattern):
         return False
 
 if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "find_files.sh")
+    script_path = os.path.expanduser("~/scripts/find_files.sh")
 
     # Create a temporary directory with some files for testing
     with tempfile.TemporaryDirectory() as temp_dir:

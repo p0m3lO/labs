@@ -23,8 +23,7 @@ def check_redirection_demo_script(script_path, input_file_path, output_file_path
         return False
 
 if __name__ == "__main__":
-    user_home_dir = os.path.expanduser("~")
-    script_path = os.path.join(user_home_dir, "redirection.sh")
+    script_path = os.path.expanduser("~/scripts/redirection.sh")
 
     # Create a temporary input file with some content for testing
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as input_temp_file:
