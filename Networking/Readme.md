@@ -5,7 +5,7 @@
 ### SSH configuration:
 
 1. generate an ***ssh-key*** and set key-based authentication on ***gde-server***
-2. Create an ***ssh configuration*** file with a stanza (section). The host should named ***gde-server*** and configure to use the generated key
+2. Create an ***global ssh configuration*** file with a stanza (section). The host should named ***gde-server*** and configure to use the generated key
 3. Test the connection eg.: ***$ ssh gde-server***
 4. Configure the local ssh daemon: disable ***root login***, disable ***password authentication***
 
@@ -13,11 +13,12 @@
 
 ### SSHFS configuration:
 
-1. Create a directory on the ***gde-server***: ***/mnt/mount***
-2. Install the sshfs package
-3. Mount it on the ***lab_vm*** with sshfs command to path: ***/mnt/shared***
-4. Make it ***auto-mount*** at startup
-5. Use the ***ssh alias*** configured in the ***1. Task***
+1. Install the sshfs and autofs package
+2. Create a directory on the ***gde-server***: ***/mnt/mount*** and a directory on the ***lab_vm***: ***/mnt/shared***
+3. Set up correct permissions for the directories
+4. Mount it on the ***lab_vm*** with sshfs command to path: ***/mnt/shared***
+5. Make it ***auto-mount*** at startup with ***autofs***, the config should be in ***/etc/gde.sshfs***
+6. Use the ***ssh alias*** configured in the ***1. Task***
 
 ## 3. Task
 

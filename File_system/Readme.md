@@ -38,3 +38,14 @@ Create a directory called ***gde_chroot*** in the '/tmp' folder and install a **
 ### Confgiure SWAP
 
 Create a 1GB swap file in the path ***/mnt/swap***, set it up, and configure it to be persistent across reboots
+
+### 5. Task
+
+### create an encrypted container using LUKS and cryptsetup
+
+1. Install the cryptsetup package.
+2. Create a 1GB file for the encrypted container called ***secret_container*** in the user home directory.
+3. Format it as a LUKS container, create filesytem make it ***ext4***
+4. Mount it to /mnt/secret
+4. Configure ***auto-mount*** at boot with a key file and set up a mapping in ***/etc/crypttab***
+
