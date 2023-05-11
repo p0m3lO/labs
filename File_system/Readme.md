@@ -18,7 +18,7 @@ Do an LVM installation using two disks, created with ***1 GB loopback devices***
 
 - Mount the filesystem: Create a mount point (e.g., /mnt/lvm) and mount the logical volume to the mount point using the mount command.
 
-- Add an fstab entry: Edit the /etc/fstab file to include an entry for the logical volume, specifying the mount point and filesystem type. 
+- Add an fstab entry: Edit the /etc/fstab file to include an entry for the logical volume, specifying the mount point and filesystem type.
 
 ## 2. Task
 
@@ -32,3 +32,9 @@ Create two ***1GB loopback device***, and then create a RAID-1 (mirrored) array 
 ### Create a chroot environment and install a minimal Debian system
 
 Create a directory called ***gde_chroot*** in the '/tmp' folder and install a ***minimal Debian buster system*** into that directory
+
+### 4. Task
+
+### Confgiure SWAP
+
+Create a 1GB swap file in the path ***/mnt/swap***, set it up, and configure it to be persistent across reboots
