@@ -24,7 +24,7 @@ Create a Bash script named ***tar_demo.sh*** in the ***scripts*** direcotry insi
 
 ## 5. Task
 
-### Create a monitor script 
+### Create a monitor script
 
 Create a ***Bash script*** named ***monitor.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that pings a server using the IP address provided as the first positional parameter. The script should be executable.
 
@@ -33,7 +33,7 @@ Create a ***Bash script*** named ***monitor.sh*** in the ***scripts*** direcotry
 
 ### Random directory and file creation script
 
-Create a Bash script named ***random.sh*** in the ***scripts*** direcotry inside vagrant user ***home directory***, the script should create random directories and files inside a target directory, the files should have ***random content***.
+Create a Bash script named ***random.sh*** in the ***scripts*** direcotry inside vagrant user ***home directory***, the script should create random ***directories*** and ***files*** inside a ***target directory***, the files should have ***random content***. The created directroies should have naming schema ***test_dir[n]*** and the created files ***file[n].txt***
 
 ***Usage:***  ./random.sh [-d|--directory num_dirs] [-f|--files num_files] target_directory
 

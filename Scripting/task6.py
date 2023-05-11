@@ -7,7 +7,7 @@ def check_random_script(target_dir, num_dirs, num_files):
     if not os.path.exists(script_path):
         print("Error: Script 'random.sh' not found in '~/scripts/'.")
         return False
-    
+
     try:
         subprocess.run([script_path, "--directory", str(num_dirs), "--files", str(num_files), target_dir], check=True)
     except subprocess.CalledProcessError as e:
@@ -21,7 +21,7 @@ def check_random_script(target_dir, num_dirs, num_files):
         if not os.path.exists(dir_path) or not os.path.isdir(dir_path):
             print(f"Error: Directory '{dir_path}' not found.")
             return False
-        
+
         for j in range(1, num_files + 1):
             file_name = f"file{j}.txt"
             file_path = os.path.join(dir_path, file_name)
