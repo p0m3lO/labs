@@ -2,7 +2,7 @@
 
 ### Basic grep Task
 
-Create a Bash script named ***search.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that searches for a ***given pattern*** in a specified file. The script should accept the file path as the first positional parameter and the pattern as the second positional parameter. The script should be executable.
+Create a Bash script named ***search.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that searches for a ***given pattern*** in a specified file. The script should accept the pattern as as the first positional parameter and the file_path as the second positional parameter. The script should be executable.
 
 ## 2. Task
 

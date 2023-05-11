@@ -6,7 +6,7 @@ import tempfile
 def check_grep_search_script(script_path, file_path, pattern):
     try:
         if os.path.isfile(script_path) and os.access(script_path, os.X_OK):
-            result = subprocess.run([script_path, file_path, pattern], capture_output=True)
+            result = subprocess.run([script_path, pattern, file_path], capture_output=True)
             if result.returncode == 0:
                 return True
             else:
