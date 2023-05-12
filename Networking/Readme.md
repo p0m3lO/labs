@@ -14,11 +14,11 @@
 ### SSHFS configuration:
 
 1. Install the sshfs and autofs package
-2. Create a directory on the ***gde-server***: ***/mnt/mount*** and a directory on the ***lab_vm***: ***/mnt/shared***
-3. Set up correct permissions for the directories
-4. Mount it on the ***lab_vm*** with sshfs command to path: ***/mnt/shared***
-5. Make it ***auto-mount*** at startup with ***autofs***, the config should be in ***/etc/gde.sshfs***
-6. Use the ***ssh alias*** configured in the ***1. Task***
+2. Use the ***ssh alias*** for the sshfs command, configured in the ***1. Task***
+3. Create a directory on the ***gde-server***: ***/mnt/mount*** and a directory on the ***lab_vm***: ***/mnt/shared***
+4. Set up correct permissions for the directories
+5. Mount it on the ***lab_vm*** with sshfs command to path: ***/mnt/shared***
+6. Make it ***auto-mount*** at startup with ***autofs***, the config should be in ***/etc/gde.sshfs***
 
 ## 3. Task
 

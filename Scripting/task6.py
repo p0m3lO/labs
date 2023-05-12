@@ -2,47 +2,50 @@ import os
 import sys
 import subprocess
 
-def check_random_script(target_dir, num_dirs, num_files):
-    script_path = os.path.expanduser("~/scripts/random.sh")
-    if not os.path.exists(script_path):
-        print("Error: Script 'random.sh' not found in '~/scripts/'.")
+def check_scp_script():
+    user_home_dir = os.path.expanduser("~")
+    script_path = os.path.expanduser("~/scripts/remote_copy.sh")
+
+    # Check if the script exists
+    if not os.path.isfile(script_path):
+        print("The scp script does not exist.")
         return False
 
-    try:
-        subprocess.run([script_path, "--directory", str(num_dirs), "--files", str(num_files), target_dir], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+    # Check if the script is executable
+    if not os.access(script_path, os.X_OK):
+        print("The scp script is not executable.")
         return False
 
-    for i in range(1, num_dirs + 1):
-        dir_name = f"test_dir{i}"
-        dir_path = os.path.join(target_dir, dir_name)
+    # Run the script and check if it completes without errors
+    result = subprocess.run([script_path, '-a', '7', '-s', '10k'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        print(f"The scp script returned an error: {result.stderr.decode('utf-8')}")
+        return False
 
-        if not os.path.exists(dir_path) or not os.path.isdir(dir_path):
-            print(f"Error: Directory '{dir_path}' not found.")
+    # Check if the remote_logs directory exists and contains files
+    remote_logs_dir = os.path.expanduser("~/remote_logs")
+    if not os.path.isdir(remote_logs_dir) or not os.listdir(remote_logs_dir):
+        print("The remote_logs directory does not exist or is empty.")
+        return False
+
+    # SSH into the other server and issue the find command
+    find_command = ["ssh", "gde-server", "sudo find /var/log -name '*.log' -mtime 7 -size +10k"]
+    result = subprocess.run(find_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # Get the list of files found by the find command
+    found_files = [f for f in result.stdout.decode('utf-8').split('\n') if f]
+
+    # Check each file in found_files exists in remote_logs_dir
+    for file in found_files:
+        local_file_path = os.path.join(remote_logs_dir, os.path.basename(file))
+        if not os.path.isfile(local_file_path):
+            print(f"The file {file} was not copied to the local machine.")
             return False
-
-        for j in range(1, num_files + 1):
-            file_name = f"file{j}.txt"
-            file_path = os.path.join(dir_path, file_name)
-
-            if not os.path.exists(file_path) or not os.path.isfile(file_path):
-                print(f"Error: File '{file_path}' not found.")
-                return False
 
     return True
 
 if __name__ == "__main__":
-    target_dir = "/tmp/test_random_script"
-    num_dirs = 10
-    num_files = 5
-
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
-
-    result = check_random_script(target_dir, num_dirs, num_files)
-    if result:
-        print(f"The 'random.sh' script works correctly. {num_dirs} directories with {num_files} files each were created in '{target_dir}'.")
-    else:
-        print(f"The 'random.sh' script does NOT work correctly.")
+    if not check_scp_script():
         sys.exit(1)
+
+    print("The scp script is working correctly!")

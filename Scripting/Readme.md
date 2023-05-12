@@ -20,7 +20,17 @@ Create a Bash script named ***find_files.sh*** in the ***scripts*** direcotry in
 
 ### Basic Tar usage
 
-Create a Bash script named ***tar_demo.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that compresses or extracts files using the ***'tar'*** command. The script should accept an operation mode flag (***"-c"*** for compress or ***"-x"*** for extract) as the first positional parameter, an archive file path as the second positional parameter, and an optional directory path as the third positional parameter (required for compression). The script should be executable.
+Create a Bash script named ***tar_demo.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that compresses or extracts files using the ***'tar'*** command. The script should accept three positional parameter:
+    - operation mode flag (***"-c"*** for compress or ***"-x"*** for extract)
+    - archive file path as the second positional parameter,
+    - an optional directory path as the third positional parameter (required for compression).
+The script should be executable
+
+Example:
+
+    ```
+    $ tar_demo.sh -c example.tar.gz example/
+    ```
 
 ## 5. Task
 
@@ -28,6 +38,22 @@ Create a Bash script named ***tar_demo.sh*** in the ***scripts*** direcotry insi
 
 Create a ***Bash script*** named ***monitor.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that pings a server using the IP address provided as the first positional parameter. The script should be executable.
 
+## 6. Task
+
+### Copy file from a remote server using SCP or RSYNC
+
+Create a ***Bash script*** named ***remote_copy.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that copy log files from a remote server ***/var/log*** directory to an arbitrary local directory.
+
+- The bash script should accept two parameter ***--age*** or -a and ***--size*** or -s
+- The goal is to find log files modified in the last [n] days and bigger than [n] size
+- The task can be done either via ***rsync*** or ***scp***
+- The approprieate packages should be installed
+
+Example usage for the script:
+
+```
+$ remote_copy.sh --age 7 --size 10k
+```
 
 ## 6. Task
 
