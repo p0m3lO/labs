@@ -59,7 +59,9 @@ $ remote_copy.sh --age 7 --size 10k
 
 ### Create a system monitor script
 
- Create a ***Bash script*** named ***system_monitor.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that performs system monitoring tasks. The script should gather information about the ***CPU***, ***memory***, and ***disk usage*** of the system. It should print the output to a log file: ***/tmp/system.log***
+ 1. Create a ***Bash script*** named ***system_monitor.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that performs system monitoring tasks. The script should gather information about the ***CPU***, ***memory***, and ***disk usage*** of the system. It should print the output to a log file: ***/tmp/system.log***
+ 2. Make sure that the script is keep running in the background, remember when you switch to the evaulation tab your shell will be closed, so you should use ***screen*** or similiar tool.
+
  The log format should look like this:
 
 ```
