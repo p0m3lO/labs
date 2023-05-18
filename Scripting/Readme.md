@@ -55,7 +55,22 @@ Example usage for the script:
 $ remote_copy.sh --age 7 --size 10k
 ```
 
-## 6. Task
+## 7. Task
+
+### Create a system monitor script
+
+ Create a ***Bash script*** named ***system_monitor.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that performs system monitoring tasks. The script should gather information about the ***CPU***, ***memory***, and ***disk usage*** of the system. It should print the output to a log file: ***/tmp/system.log***
+ The log format should look like this:
+
+```
+[2023-05-18 11:41:00] System Information:
+[2023-05-18 11:41:00] -------------------
+[2023-05-18 11:41:00] CPU: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+[2023-05-18 11:41:00] Memory Usage: 65Mi/1.9Gi
+[2023-05-18 11:41:00] Disk Usage: 1.5G/20G
+```
+
+## 8. Task
 
 ### Random directory and file creation script
 
