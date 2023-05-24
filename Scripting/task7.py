@@ -3,12 +3,15 @@ import sys
 
 # Check if the bash script is running
 def check_script_running():
-    process = subprocess.run(["pgrep", "-f", "system_monitor.sh"], capture_output=True, text=True)
-    return process.returncode == 0
+    process = subprocess.run(["sudo", "pgrep", "-f", "system_monitor.sh"], shell=True, capture_output=True, text=True)
+    if process.returncode == 0:
+        return True
+    else:
+        return False
 
 # Check the latest log entry
 def check_latest_log_entry():
-    with open("/tmp/system_monitor.log", "r") as log_file:
+    with open("/tmp/system.log", "r") as log_file:
         lines = log_file.readlines()
         if lines:
             return lines[-1].strip()

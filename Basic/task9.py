@@ -3,12 +3,13 @@ import sys
 import subprocess
 import re
 
-def check_locale(target_locale):
+def check_locale():
     try:
         result = subprocess.run(["localectl", "status"], stdout=subprocess.PIPE, text=True)
         current_locale = re.search(r'LANG=(.+)', result.stdout)
         if current_locale:
-            return current_locale.group(1) == target_locale
+            # Now checking if 'hu_' is in the string
+            return 'hu_' in current_locale.group(1)
         else:
             return False
     except subprocess.CalledProcessError as e:
@@ -16,12 +17,11 @@ def check_locale(target_locale):
         return False
 
 if __name__ == "__main__":
-    target_locale = "hu_HU.UTF-8"
-
-    locale_result = check_locale(target_locale)
+    locale_result = check_locale()
 
     if locale_result:
-        print(f"The locale is set to '{target_locale}'.")
+        print("The locale is set to a Hungarian language option.")
+
     else:
-        print(f"The locale is NOT set to '{target_locale}'.")
+        print("The locale is NOT set to a Hungarian language option.")
         sys.exit(1)

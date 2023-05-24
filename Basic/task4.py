@@ -12,6 +12,13 @@ def check_permanent_hostname(target_hostname):
         if hostname != target_hostname:
             return False
 
+    except FileNotFoundError:
+        print("Error: File not found. Make sure the script is run as root or with proper permissions.")
+        return False
+
+def check_hostfile(target_hostname):
+    hosts_file = "/etc/hosts"
+    try:
         with open(hosts_file, 'r') as f:
             hosts = f.readlines()
 
@@ -30,8 +37,12 @@ def check_permanent_hostname(target_hostname):
 if __name__ == "__main__":
     target_hostname = "gde-lab"
     result = check_permanent_hostname(target_hostname)
+    hosts_result = check_hostfile(target_hostname)
     if result:
         print(f"The hostname is set permanently to '{target_hostname}'.")
+    elif not hosts_result:
+        print(f"The '{target_hostname}' is NOT set in hosts file")
+        sys.exit(1)
     else:
         print(f"The hostname is NOT set permanently to '{target_hostname}'.")
         sys.exit(1)

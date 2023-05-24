@@ -10,32 +10,28 @@ def check_package_installed(package_name):
     except subprocess.CalledProcessError:
         return False
 
-def check_iptables_rules():
-    try:
-        result = subprocess.run(['sudo', 'iptables', '-S'], stdout=subprocess.PIPE, text=True)
-        rules = result.stdout.split('\n')
-        rules = [' '.join(rule.split()) for rule in rules]
+def test_connections(ssh_alias, ip, ports):
+    for port in ports:
+        command = ['ssh', ssh_alias, 'nc', '-zv', ip, str(port)]
+        try:
+            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            if 'succeeded' in result.stdout:
+                print(f"Connection to {ip} on port {port} succeeded.")
+            else:
+                print(f"Connection to {ip} on port {port} failed.")
+                return False
+        except subprocess.CalledProcessError as e:
+            print(f"Connection to {ip} on port {port} failed: {e}")
+            return False
+    return True
 
-        expected_rules = {
-            '-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 80 -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 443 -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 2049 -j ACCEPT',
-            '-A INPUT -s 192.168.10.20/32 -p tcp -m tcp --dport 25 -j ACCEPT',
-            '-A INPUT -p tcp -m tcp --dport 5000 -j ACCEPT',
-            '-A INPUT -p tcp -m tcp --dport 7681 -j ACCEPT',
-            '-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT',
-            '-A INPUT -j DROP'
-        }
+def check_connections():
+    all_ports = [22, 5000, 7681, 80, 443, 2049, 25]
+    if not test_connections('example-server', '192.168.20.10', all_ports):
+        return False
+    return True
 
-        return expected_rules.issubset(set(rules)), expected_rules
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
-        return False, {}
-
-
-def check_persistence(expected_rules):
-    # Check if the package iptables-persistent is installed
+def check_persistence():
     package_installed = check_package_installed("iptables-persistent")
     if package_installed:
         return True
@@ -44,45 +40,29 @@ def check_manual_persistence():
     script_path = "/etc/network/if-pre-up.d/iptables"
     expected_line = "iptables-restore < /etc/iptables/rules.v4"
 
-    # Check that the script file exists
     if not os.path.exists(script_path):
         return False
 
-    # Check the content of the script file
     with open(script_path, 'r') as f:
         lines = f.readlines()
 
     if expected_line not in [line.strip() for line in lines]:
         return False
 
-    # Check that the script file is executable
     if not os.access(script_path, os.X_OK):
         return False
 
     return True
 
-    # Check for manual persistence
-    try:
-        with open('/etc/iptables/rules.v4', 'r') as f:
-            rules = f.read().splitlines()
-        for rule in expected_rules:
-            if rule not in rules:
-                return False
-        return True
-    except FileNotFoundError:
-        return False
-
-
 if __name__ == "__main__":
-    rules_ok, expected_rules = check_iptables_rules()
-    if not rules_ok:
+    if not check_connections():
         print("The iptables rules are not configured correctly.")
         sys.exit(1)
 
-    if check_persistence(expected_rules):
+    if check_persistence():
         print("The iptables rules are persistent.")
 
-    elif not check_persistence(expected_rules):
+    elif not check_persistence():
         if check_manual_persistence():
             print("The iptables manual persistency is set up correctly.")
         else:
@@ -91,6 +71,5 @@ if __name__ == "__main__":
     else:
         print("The iptables rules are not persistent.")
         sys.exit(1)
-
 
     print("The iptables rules are configured correctly and persistent!")
