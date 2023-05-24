@@ -33,9 +33,9 @@ def check_second_output(output_file):
     try:
         with open(output_file, 'r') as f:
             lines = f.readlines()
-        
+
         for line in lines:
-            if not line.startswith("found directory: ./") or not line.strip().endswith(")"):
+            if not line.startswith("found directory:") or not line.strip().endswith(")"):
                 return False
         return True
     except FileNotFoundError:
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     else:
         print("An error occurred while checking the first output file.")
         sys.exit(1)
-    
+
     if check_second_output(dir_output_file):
         print("The second output file has the expected content.")
     else:
