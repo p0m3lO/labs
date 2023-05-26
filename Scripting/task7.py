@@ -1,16 +1,18 @@
 import subprocess
 import sys
+import os
 
 # Check if the bash script is running
 def check_script_running():
-    process = subprocess.run(["sudo", "pgrep", "-f", "system_monitor.sh"], shell=True, capture_output=True, text=True)
-    if process.returncode == 0:
-        return True
-    else:
-        return False
+    process = subprocess.run(['pgrep', '-f', '(^|/|./)system_monitor.sh($|\s)'], capture_output=True, text=True)
+    return len(process.stdout.strip()) > 0
 
 # Check the latest log entry
 def check_latest_log_entry():
+    if not os.path.isfile("/tmp/system.log"):
+        print("Log file not found.")
+        sys.exit(1)
+
     with open("/tmp/system.log", "r") as log_file:
         lines = log_file.readlines()
         if lines:
