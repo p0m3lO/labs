@@ -39,7 +39,7 @@ def check_hostfile(target_hostname):
 
 
 if __name__ == "__main__":
-    target_hostname = "gde-exam"
+    target_hostname = "gde-lab"
     result = check_permanent_hostname(target_hostname)
     hosts_result = check_hostfile(target_hostname)
     if result and hosts_result:
