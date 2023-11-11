@@ -46,7 +46,7 @@ Create a ***cron job*** that runs ***every 2 minutes*** and appends the current 
 
 ### Simple Find usage
 
-1. Find all ***.log*** files inside ***/var/log*** directory and its subdirectories that are larger than ***10 kilobytes*** and have been modified within the ***last 7 days*** and save the output to a log file called ***/tmp/first_output.log*** inside the home directory.
+1. Find all ***.log*** files inside ***/var/log*** directory and its subdirectories that are larger than ***10 kilobytes*** and have been modified within the ***last 7 days*** and save the output to a log file called ***/tmp/first_output.log***.
 
 2. Create some random directory and files in the user home directory (use a script for that). Find all directories in the user home directory: exclude the ***hidden directories***, and save  them to file called ***/tmp/second_output.log***. The output inside this log file should follow this format:
     ***found directory: ./<dirname> (4.0K)***
