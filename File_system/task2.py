@@ -3,10 +3,22 @@ import sys
 
 def check_raid_array(devices, level):
     try:
-        result = subprocess.run(["mdadm", "--detail", "/dev/md0"], stdout=subprocess.PIPE, text=True)
-        devices_str = " ".join(devices)
-        return f"Raid Level : {level}" in result.stdout and devices_str in result.stdout
-    except subprocess.CalledProcessError:
+        result = subprocess.run(["sudo", "mdadm", "--detail", "/dev/md0"], stdout=subprocess.PIPE, text=True)
+        output_lines = result.stdout.split('\n')
+        
+        # Check RAID level
+        raid_level_correct = any(f"Raid Level : {level}" in line for line in output_lines)
+
+        # Check each device
+        devices_correct = all(any(device in line for line in output_lines) for device in devices)
+
+        return raid_level_correct and devices_correct
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing mdadm: {e}")
+        return False
+    except Exception as e:
+        print(f"Unexpected error: {e}")
         return False
 
 if __name__ == "__main__":

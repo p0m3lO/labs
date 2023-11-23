@@ -5,33 +5,33 @@ import subprocess
 def check_lvm_setup(disk1, disk2, vg_name, lv_name, mount_point, fs_type):
     try:
         # Check if the physical volumes exist
-        pv_check = subprocess.run(["pvs", disk1, disk2], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        pv_check = subprocess.run(["sudo", "pvs", disk1, disk2], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if pv_check.returncode != 0:
             return False
 
         # Check if the volume group exists and contains the specified physical volumes
-        vg_check = subprocess.run(["vgs", vg_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        vg_check = subprocess.run(["sudo", "vgs", vg_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if vg_check.returncode != 0:
             return False
 
         # Check if the logical volume exists
-        lv_check = subprocess.run(["lvs", f"{vg_name}/{lv_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        lv_check = subprocess.run(["sudo", "lvs", f"{vg_name}/{lv_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if lv_check.returncode != 0:
             return False
 
         # Check if the filesystem type is correct
-        fs_check = subprocess.run(["blkid", "-o", "value", "-s", "TYPE", f"/dev/{vg_name}/{lv_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        fs_check = subprocess.run(["sudo", "blkid", "-o", "value", "-s", "TYPE", f"/dev/{vg_name}/{lv_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if fs_check.stdout.decode("utf-8").strip() != fs_type:
             return False
 
         # Check if the filesystem is mounted at the specified mount point
-        mount_check = subprocess.run(["findmnt", "-rn", "-S", f"/dev/{vg_name}/{lv_name}", "-T", mount_point], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        mount_check = subprocess.run(["sudo", "findmnt", "-rn", "-S", f"/dev/{vg_name}/{lv_name}", "-T", mount_point], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if mount_check.returncode != 0:
             return False
 
         # Check for the fstab entry
         with open('/etc/fstab', 'r') as fstab:
-            fstab_entry = f"/dev/mapper/{vg_name}-{lv_name}\s+{mount_point}\s+{fs_type}"
+            fstab_entry = f"(/dev/mapper/{vg_name}-{lv_name}|/dev/{vg_name}/{lv_name})\s+{mount_point}\s+{fs_type}"
             if not any(re.search(fstab_entry, line) for line in fstab):
                 return False
 
@@ -44,8 +44,8 @@ def check_lvm_setup(disk1, disk2, vg_name, lv_name, mount_point, fs_type):
 if __name__ == "__main__":
     import re
 
-    disk1 = "/dev/sda"
-    disk2 = "/dev/sdb"
+    disk1 = "/dev/loop1"
+    disk2 = "/dev/loop2"
     vg_name = "gde_group"
     lv_name = "gde_volume"
     mount_point = "/mnt/lvm"

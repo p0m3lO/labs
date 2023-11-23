@@ -10,15 +10,17 @@ Do an LVM installation using two disks, created with ***1 GB loopback devices***
 
 - Create physical volumes: Set up the two disks as physical volumes using the pvcreate command.
 
-- Create a volume group: Combine the physical volumes into a volume group using the vgcreate command.
+- Create a volume group: Combine the physical volumes into a volume group using the vgcreate command. The group name should be ***gde_group***
 
-- Create a logical volume: Create a logical volume within the volume group using the lvcreate command.
+- Create a logical volume: Create a logical volume within the volume group using the lvcreate command. The volume name should be ***gde_volume***
 
-- Create a filesystem: Format the logical volume with the desired filesystem type (e.g., ext4) using the mkfs command.
+- Create a filesystem: Format the logical volume with the desired filesystem type (***ext4***) using the mkfs command.
 
 - Mount the filesystem: Create a mount point (e.g., /mnt/lvm) and mount the logical volume to the mount point using the mount command.
 
 - Add an fstab entry: Edit the /etc/fstab file to include an entry for the logical volume, specifying the mount point and filesystem type.
+
+- Because the lvm setup based on loop devices make sure that these devices persistent as well and mounted before the lvm device during boot
 
 ## 2. Task
 
