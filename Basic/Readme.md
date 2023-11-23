@@ -40,7 +40,7 @@ Create a ***symbolic link*** named ***gde_link*** in the ***home directory*** th
 
 ### Basic cron job Task
 
-Create a ***cron job*** that runs ***every 2 minutes*** and appends the current date and time to a file called 'timestamps.txt' in the '/tmp' directory.
+Create a ***cron job*** for the ***gde user*** that runs ***every 2 minutes*** and appends the current date and time to a file called 'timestamps.txt' in the '/tmp' directory. The ***date format*** should be in Hungarian localization.
 
 ### 8. Task
 

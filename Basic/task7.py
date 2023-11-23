@@ -7,7 +7,7 @@ import chardet
 
 def check_cron_job_exists():
     try:
-        result = subprocess.run(["crontab", "-l"], stdout=subprocess.PIPE, text=True)
+        result = subprocess.run(["sudo", "crontab", "-u", "gde", "-l"], stdout=subprocess.PIPE, text=True)
         match = re.search(r'\*/2 \* \* \* \*', result.stdout)
         return match is not None
     except subprocess.CalledProcessError:
@@ -33,7 +33,7 @@ def check_file_content(file_path):
     last_line = lines[-1].strip()
 
     # Check if the last line in the file contains a timestamp
-    match = re.search(r'(\w{3}\s\d{2}\s\w{3}\s\d{4}\s\d{2}:\d{2}:\d{2}\s(?:AM|PM)\sUTC|\d{4}.\s\w+.\s\d{2}.,\s\w+,\s\d{2}:\d{2}:\d{2}\sUTC)', last_line)
+    match = re.search(r'\d{4}\. \w{3}\. \d{1,2}\., \w+, \d{2}:\d{2}:\d{2} \w+', last_line)
     return match is not None
 
 if __name__ == "__main__":
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         if check_file_content(file_path):
             print("The cron job is running and appending to the file.")
         else:
-            print("The cron job is NOT running or appending to the file.")
+            print("The cron job is running but not appending to the file in the correct format.")
             sys.exit(1)
     else:
         print("The cron job is NOT configured correctly.")
