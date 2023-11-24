@@ -9,16 +9,20 @@ def check_package_installed(package_name):
     except subprocess.CalledProcessError:
         return False
 
-def find_screen_session(session_name):
+
+def find_screen_session_pid(session_name):
     try:
         result = subprocess.run(["screen", "-ls"], stdout=subprocess.PIPE, text=True)
-        return session_name in result.stdout
+        # Regex to find the session with its PID
+        match = re.search(r'(\d+).%s\s+\(' % re.escape(session_name), result.stdout)
+        return match.group(1) if match else None
     except subprocess.CalledProcessError:
-        return False
+        return None
 
-def check_process_running(process_name):
+def check_process_running_in_screen(screen_pid, process_name):
     try:
-        result = subprocess.run(["pgrep", "-a", process_name], stdout=subprocess.PIPE, text=True)
+        cmd = f"ps -ef | grep {screen_pid} | grep -v grep | grep {process_name}"
+        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, text=True)
         return bool(result.stdout.strip())
     except subprocess.CalledProcessError:
         return False
@@ -33,17 +37,13 @@ if __name__ == "__main__":
         print(f"The 'screen' package is not installed")
         sys.exit(1)
 
-    screen_session_found = find_screen_session(session_name)
-    if not screen_session_found:
-        print(f"the '{session_name}' session is NOT running")
-        sys.exit(1)
+    screen_pid = find_screen_session_pid(session_name)
+    if screen_pid and check_process_running_in_screen(screen_pid, process_name):
+        print(f"{process_name} is running within the {session_name} session.")
+    else:
+        print(f"{process_name} is NOT running within the {session_name} session.")
 
-    process_running = check_process_running(process_name)
-    if not process_running:
-        print(f"the '{process_name}' script is NOT running within the session")
-        sys.exit(1)
-
-    if screen_installed and screen_session_found and process_running:
+    if screen_installed and screen_pid:
         print(f"The 'screen' package is installed, the '{session_name}' session is running, and the '{process_name}' script is running within the session.")
     else:
         print(f"Either the 'screen' package is NOT installed, the '{session_name}' session is NOT running, or the '{process_name}' script is NOT running within the session.")
