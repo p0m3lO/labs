@@ -42,7 +42,7 @@ Create a ***Bash script*** named ***monitor.sh*** in the ***scripts*** direcotry
 
 ### Copy file from a remote server using SCP or RSYNC
 
-Create a ***Bash script*** named ***remote_copy.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that copy log files from a remote server ***/var/log*** directory to an arbitrary local directory.
+Create a ***Bash script*** named ***remote_copy.sh*** in the ***scripts*** direcotry inside ***vagrant user home directory*** that copy log files from a remote server ***/var/log*** directory to a local directory called ***remote_logs*** inside ***vagrant user home directory***.
 
 - The bash script should accept two parameter ***--age*** or -a and ***--size*** or -s
 - The goal is to find log files modified in the last [n] days and bigger than [n] size
